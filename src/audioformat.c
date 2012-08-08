@@ -56,20 +56,20 @@ BTOVEN_ENCODING( BTOVEN_ENC_FLOAT_64 )
 BTOVEN_END_ENCODINGS
 
 /*---------------------------------------------------------------------------------------
-btoven_set_encoding
-Input: btoven_audioformat &af - audioformat to augment
-       btoven_enc enc - encoding to try
-Output: BTOVEN_ERROR - Error Code
-Description: Sets the format's encoding, and checks if its supported
+ btoven_set_encoding
+ Input: btoven_audioformat &af - audioformat to augment
+        btoven_enc enc - encoding to try
+ Output: BTOVEN_ERROR - Error Code
+ Description: Sets the format's encoding, and checks if its supported
  Returns BTOVEN_ENCODING_NOT_SUPPORTED if the encoding is not supported
 ---------------------------------------------------------------------------------------*/
 btoven_error btoven_set_encoding( btoven_audioformat *af, btoven_enc enc )
 {
 	if( btoven_enc_supported( enc ) )
-                af->enc = enc; 
-        else
-                return BTOVEN_ENCODING_NOT_SUPPORTED; 
-        return BTOVEN_OK; 
+		af->enc = enc; 
+	else
+		return BTOVEN_ENCODING_NOT_SUPPORTED; 
+	return BTOVEN_OK; 
 }
 
 /*---------------------------------------------------------------------------------------
@@ -79,18 +79,18 @@ btoven_error btoven_set_encoding( btoven_audioformat *af, btoven_enc enc )
  Description: Sometimes it is handy to know the size in bytes of the encoding
  ---------------------------------------------------------------------------------------*/
 uint32_t btoven_enc_size( btoven_enc enc )
-{ 
-        if( enc & BTOVEN_ENC_8 )
-                return ( ( 8 / CHAR_BIT ) + 0.99f );
-        else if( enc & BTOVEN_ENC_16 )
-                return ( ( 16 / CHAR_BIT ) + 0.99f );
-        else if( enc & BTOVEN_ENC_24 )
-                return ( ( 24 / CHAR_BIT ) + 0.99f );
-        else if( enc & BTOVEN_ENC_32 )
-                return ( ( 32 / CHAR_BIT ) + 0.99f );
-        else if( enc & BTOVEN_ENC_64 )
-                return ( ( 64 / CHAR_BIT ) + 0.99f );
-        return 0;
+{
+	if( enc & BTOVEN_ENC_8 )
+		return ( ( 8 / CHAR_BIT ) + 0.99f );
+	else if( enc & BTOVEN_ENC_16 )
+		return ( ( 16 / CHAR_BIT ) + 0.99f );
+	else if( enc & BTOVEN_ENC_24 )
+		return ( ( 24 / CHAR_BIT ) + 0.99f );
+	else if( enc & BTOVEN_ENC_32 )
+		return ( ( 32 / CHAR_BIT ) + 0.99f );
+	else if( enc & BTOVEN_ENC_64 )
+		return ( ( 64 / CHAR_BIT ) + 0.99f );
+	return 0;
 }
 
 /*---------------------------------------------------------------------------------------
@@ -100,59 +100,59 @@ uint32_t btoven_enc_size( btoven_enc enc )
  Description: Find out if the format supported on this platform
  ---------------------------------------------------------------------------------------*/
 bool btoven_enc_supported( btoven_enc enc )
-{ 
-        // We can use the same logic as in the header to decide if the encoding is supported
-        switch( enc )
-        {
-                case BTOVEN_ENC_SIGNED_8:
-                case BTOVEN_ENC_UNSIGNED_8:
+{
+	// We can use the same logic as in the header to decide if the encoding is supported
+	switch( enc )
+	{
+		case BTOVEN_ENC_SIGNED_8:
+		case BTOVEN_ENC_UNSIGNED_8:
 #ifdef INT8_MAX
-                        return true;
+			return true;
 #else // INT8_MAX
-                        return false;
+			return false;
 #endif // INT8_MAX
-                        break;
-                case BTOVEN_ENC_SIGNED_16:
-                case BTOVEN_ENC_UNSIGNED_16:
+		break;
+		case BTOVEN_ENC_SIGNED_16:
+		case BTOVEN_ENC_UNSIGNED_16:
 #ifdef INT16_MAX
-                        return true;
+			return true;
 #else // INT16_MAX
-                        return false;
+			return false;
 #endif // INT16_MAX
-                        break;
-                case BTOVEN_ENC_SIGNED_24:
-                case BTOVEN_ENC_UNSIGNED_24:
+			break;
+		case BTOVEN_ENC_SIGNED_24:
+		case BTOVEN_ENC_UNSIGNED_24:
 #ifdef INT24_MAX
-                        return true;
+			return true;
 #else // INT24_MAX
-                        return false;
+			return false;
 #endif // INT24_MAX
-                        break;
-                case BTOVEN_ENC_SIGNED_32:
-                case BTOVEN_ENC_UNSIGNED_32:
+			break;
+		case BTOVEN_ENC_SIGNED_32:
+		case BTOVEN_ENC_UNSIGNED_32:
 #ifdef INT32_MAX
-                        return true;
+			return true;
 #else // INT32_MAX
-                        return false;
+			return false;
 #endif // INT32_MAX
-                        break;
-                case BTOVEN_ENC_FLOAT_32:
+			break;
+		case BTOVEN_ENC_FLOAT_32:
 #ifdef BTOVEN_FLOAT32
-                        return true;
+			return true;
 #else // BTOVEN_FLOAT32
-                        return false;
+			return false;
 #endif // BTOVEN_FLOAT32
-                        break;
-                case BTOVEN_ENC_FLOAT_64:
+			break;
+		case BTOVEN_ENC_FLOAT_64:
 #ifdef BTOVEN_FLOAT64
-                        return true;
+			return true;
 #else // BTOVEN_FLOAT64
-                        return false;
+			return false;
 #endif // BTOVEN_FLOAT64
-                        break;
-                default:
-                        return false;
-        }
+			break;
+		default:
+			return false;
+	}
 }
 
 /*---------------------------------------------------------------------------------------
@@ -166,16 +166,12 @@ bool btoven_enc_supported( btoven_enc enc )
  ---------------------------------------------------------------------------------------*/
 BTOVEN_STORETYPE btoven_decodePCM( btoven_audioformat *af, void** pcm, uint8_t channel, uint32_t frame )
 {
-        // We are unable to do bounds checking on the frame, but we can check the channel!
-        if( channel >= af->channels )
-                return 0;
-        
-        // Return the requested data
-        if( af->interleaved )
-                return BTOVEN_DECODE( af->enc )( pcm, 0, ( frame * af->channels ) + channel );
-        else 
-                return BTOVEN_DECODE( af->enc )( pcm, channel, frame );
-        return 0;
+	// We are unable to do bounds checking on the frame, but we can check the channel!
+	if( channel >= af->channels )
+		return 0;
+		
+	// Return the requested data
+	return BTOVEN_DECODE( af->enc )( pcm, channel, frame );
 }
 
 /*---------------------------------------------------------------------------------------
@@ -186,37 +182,37 @@ BTOVEN_STORETYPE btoven_decodePCM( btoven_audioformat *af, void** pcm, uint8_t c
  ---------------------------------------------------------------------------------------*/
 int32_t btoven_enc2idx( btoven_enc enc )
 {
-		int32_t ret = 0;
+	int32_t ret = 0;
 
-        // Ensure the encoding is supported first
-        if( !btoven_enc_supported( enc ) )
-                return -1; 
-        
-        // Find which index represents this encoding
+	// Ensure the encoding is supported first
+	if( !btoven_enc_supported( enc ) )
+		return -1; 
+
+	// Find which index represents this encoding
 #ifdef INT8_MAX
-        if( enc == BTOVEN_ENC_SIGNED_8 ) return ret; else ret++;
-        if( enc == BTOVEN_ENC_UNSIGNED_8 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_SIGNED_8 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_UNSIGNED_8 ) return ret; else ret++;
 #endif // INT8_MAX
 #ifdef INT16_MAX
-        if( enc == BTOVEN_ENC_SIGNED_16 ) return ret; else ret++;
-        if( enc == BTOVEN_ENC_UNSIGNED_16 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_SIGNED_16 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_UNSIGNED_16 ) return ret; else ret++;
 #endif // INT16_MAX
 #ifdef INT24_MAX
-        if( enc == BTOVEN_ENC_SIGNED_24 ) return ret; else ret++;
-        if( enc == BTOVEN_ENC_UNSIGNED_24 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_SIGNED_24 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_UNSIGNED_24 ) return ret; else ret++;
 #endif // INT24_MAX
 #ifdef INT32_MAX
-        if( enc == BTOVEN_ENC_SIGNED_32 ) return ret; else ret++;
-        if( enc == BTOVEN_ENC_UNSIGNED_32 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_SIGNED_32 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_UNSIGNED_32 ) return ret; else ret++;
 #endif // INT32_MAX
 #ifdef BTOVEN_FLOAT32
-        if( enc == BTOVEN_ENC_FLOAT_32 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_FLOAT_32 ) return ret; else ret++;
 #endif // BTOVEN_FLOAT32
 #ifdef BTOVEN_FLOAT64
-        if( enc == BTOVEN_ENC_FLOAT_64 ) return ret; else ret++;
+	if( enc == BTOVEN_ENC_FLOAT_64 ) return ret; else ret++;
 #endif // BTOVEN_FLOAT64
-        
-        // Shouldn't ever get here, but if we do, something bad happened.
-        return -1;
+
+	// Shouldn't ever get here, but if we do, something bad happened.
+	return -1;
 }
 
