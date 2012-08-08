@@ -33,36 +33,36 @@ extern btoven_getPCM __btoven__getPCM_array[];
 BTOVEN_STORETYPE __btoven__get__##code##__( void** pcm, int channel, int frame );
 #define BTOVEN_ENCODING_DEFINITION( code, encoding ) \
 BTOVEN_STORETYPE __btoven__get__##code##__( void** pcm, int channel, int frame ) { \
-        BTOVEN_STORETYPE ret = 0; \
-        BTOVEN_STORETYPEU utemp = 0; \
-        encoding num = ( ( encoding** )pcm )[ channel ][ frame ]; \
-        uint32_t shiftamt = 0; \
-        uint8_t sign = ( ( ( encoding ) 0 ) - 1 ) < 0; \
-        if( sizeof( encoding ) < sizeof( BTOVEN_STORETYPE ) ) { \
-                shiftamt = ( sizeof( BTOVEN_STORETYPE ) - sizeof( encoding ) ) * CHAR_BIT; \
-                if( sign ) { \
-                        ret = ( ( BTOVEN_STORETYPE )num ) << shiftamt; \
-                } else { \
-                        utemp = ( ( BTOVEN_STORETYPEU )num ) << shiftamt; \
-                        ret = ( BTOVEN_STORETYPE ) ( utemp - BTOVEN_STORETYPEMAX ); \
-                } \
-        } else { \
-                shiftamt = ( sizeof( encoding ) - sizeof( BTOVEN_STORETYPE ) ) * CHAR_BIT; \
-                if( sign ) { \
-                        ret = ( BTOVEN_STORETYPE ) ( num >> shiftamt ); \
-                } else { \
-                        utemp = ( BTOVEN_STORETYPEU )( num >> shiftamt ); \
-                        ret = ( BTOVEN_STORETYPE ) ( utemp - BTOVEN_STORETYPEMAX ); \
-                } \
-        } \
-        return ret; \
+	BTOVEN_STORETYPE ret = 0; \
+	BTOVEN_STORETYPEU utemp = 0; \
+	encoding num = ( ( encoding** )pcm )[ channel ][ frame ]; \
+	uint32_t shiftamt = 0; \
+	uint8_t sign = ( ( ( encoding ) 0 ) - 1 ) < 0; \
+	if( sizeof( encoding ) < sizeof( BTOVEN_STORETYPE ) ) { \
+		shiftamt = ( sizeof( BTOVEN_STORETYPE ) - sizeof( encoding ) ) * CHAR_BIT; \
+		if( sign ) { \
+			ret = ( ( BTOVEN_STORETYPE )num ) << shiftamt; \
+		} else { \
+			utemp = ( ( BTOVEN_STORETYPEU )num ) << shiftamt; \
+			ret = ( BTOVEN_STORETYPE ) ( utemp - BTOVEN_STORETYPEMAX ); \
+		} \
+	} else { \
+		shiftamt = ( sizeof( encoding ) - sizeof( BTOVEN_STORETYPE ) ) * CHAR_BIT; \
+		if( sign ) { \
+			ret = ( BTOVEN_STORETYPE ) ( num >> shiftamt ); \
+		} else { \
+			utemp = ( BTOVEN_STORETYPEU )( num >> shiftamt ); \
+			ret = ( BTOVEN_STORETYPE ) ( utemp - BTOVEN_STORETYPEMAX ); \
+		} \
+	} \
+	return ret; \
 }
 
 // We also need a special function to support floating point types because bit twiddling
 // on floating point numbers is a big no-no.
 #define BTOVEN_ENCODING_DEFINITION_FLOAT( code, encoding ) \
 BTOVEN_STORETYPE __btoven__get__##code##__( void** pcm, int channel, int frame ) { \
-        return ( BTOVEN_STORETYPE ) ( ( ( encoding** )pcm )[ channel ][ frame ] * BTOVEN_STORETYPEMAX ); \
+	return ( BTOVEN_STORETYPE ) ( ( ( encoding** )pcm )[ channel ][ frame ] * BTOVEN_STORETYPEMAX ); \
 }
 
 // Front end function for retreival of PCM data
