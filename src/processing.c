@@ -56,9 +56,8 @@ void btoven_proc_envelope( btoven_track* t )
 			val += t->pcm_chunk[ chan ][ frame ];
 		t->mono_pcm[ frame ] = val / t->af.channels;
 	}
-	
-	input = ( void** ) &( t->mono_pcm );
-	btoven_audiobuffer_push( t->mono_buf, &_btoven_storetype_format, input, t->pcm_chunk_size );
+
+	btoven_audiobuffer_push( t->mono_buf, &_btoven_storetype_format, t->pcm_chunk_size, t->mono_pcm );
 
 	// Filter, Extract Envelope, and Sample into History
 	for( band = 0; band < _btoven_std_num_subbands; band++ )

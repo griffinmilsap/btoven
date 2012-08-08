@@ -77,15 +77,29 @@ void btoven_delete_audiobuffer( btoven_audiobuffer** buf )
 	( *buf ) = NULL;
 }
 
-void btoven_audiobuffer_push( btoven_audiobuffer* const buf, btoven_audioformat* fmt, void** data, uint32_t num_frames )
+void btoven_audiobuffer_push( btoven_audiobuffer* const buf, btoven_audioformat* fmt, uint32_t num_frames, ... )
+{
+	va_list data;
+	va_start( data, num_frames );
+	btoven_audiobuffer_vpush( buf, fmt, num_frames, data );
+}
+
+void btoven_audiobuffer_vpush( btoven_audiobuffer* const buf, btoven_audioformat* fmt, uint32_t num_frames, va_list data )
 {
 	size_t channel, frame;
 	
 	// Copy the new data into the buffer
 	resize_buffer_if_necessary( buf, num_frames );
+	const void* sample_data = va_arg( data, const void* );
 	for( channel = 0; channel < buf->channels; channel++ )
+	{
+		if( sample_data == NULL ) break;  // IF WE BREAK HERE, THIS INDICATES A SEVERE ERROR.
 		for( frame = 0; frame < num_frames; frame++ )
-			buf->pcm[ channel ][ buf->cursize + frame ] =  btoven_decodePCM( fmt, data, channel, frame );
+			buf->pcm[ channel ][ buf->cursize + frame ] = ( fmt->interleaved ) ? 
+				btoven_decodePCM( fmt, sample_data, ( fmt->channels * frame ) + channel ) :
+				btoven_decodePCM( fmt, sample_data, frame );
+		if( !fmt->interleaved ) sample_data = va_arg( data, const void* );
+	}
 	buf->cursize += num_frames;
 }
 

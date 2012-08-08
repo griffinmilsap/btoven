@@ -157,21 +157,17 @@ bool btoven_enc_supported( btoven_enc enc )
 
 /*---------------------------------------------------------------------------------------
  btoven_getPCM
- Input: btoven_audioformat& -- The audio format that the audio to decode is in
+ Input: btoven_audioformat* -- The audio format that the audio to decode is in
         void** -- The raw data, encoding given by mEncoding
+        uint8_t -- The requested channel
         uint32_t -- The requested frame
-        uint32_t -- The requested channel
  Output: BTOVEN_STORETYPE -- The requested PCM value
  Description: Decodes the PCM in the given array as denoted by the encoding
  ---------------------------------------------------------------------------------------*/
-BTOVEN_STORETYPE btoven_decodePCM( btoven_audioformat *af, void** pcm, uint8_t channel, uint32_t frame )
+BTOVEN_STORETYPE btoven_decodePCM( btoven_audioformat *af, const void* pcm, uint32_t sample )
 {
-	// We are unable to do bounds checking on the frame, but we can check the channel!
-	if( channel >= af->channels )
-		return 0;
-		
 	// Return the requested data
-	return BTOVEN_DECODE( af->enc )( pcm, channel, frame );
+	return BTOVEN_DECODE( af->enc )( pcm, sample );
 }
 
 /*---------------------------------------------------------------------------------------

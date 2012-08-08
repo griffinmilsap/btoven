@@ -109,7 +109,7 @@ bool btoven_initialized();
 // The following functions should only be called from the "Initialized" state
 btoven_error btoven_create_track( btoven_audioformat fmt, btoven_trackhandle* h );
 void btoven_reset_track( btoven_trackhandle th );
-btoven_error btoven_process( btoven_trackhandle th, uint32_t numFrames, const void* const pcm, ... );
+btoven_error btoven_process( btoven_trackhandle th, uint32_t numFrames, ... );
 btoven_state btoven_read_state( btoven_trackhandle th );
 btoven_error btoven_delete_track( btoven_trackhandle th );
 void btoven_cleanup();

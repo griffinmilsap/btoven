@@ -3,6 +3,7 @@
 #ifndef _AUDIO_BUFFER_H
 #define _AUDIO_BUFFER_H
 
+#include <stdarg.h>
 #include <btoven.h>
 #include "audioformat.h"
 
@@ -18,7 +19,8 @@ btoven_audiobuffer* btoven_create_audiobuffer( btoven_audioformat* fmt );
 // Delete an audiobuffer (retains its position in audiobuffer array)
 void btoven_delete_audiobuffer( btoven_audiobuffer** buffer );
 // Push data into the audiobuffer
-void btoven_audiobuffer_push( btoven_audiobuffer* const buf, btoven_audioformat* fmt, void** data, uint32_t num_frames );
+void btoven_audiobuffer_push( btoven_audiobuffer* const buf, btoven_audioformat* fmt, uint32_t num_frames, ... );
+void btoven_audiobuffer_vpush( btoven_audiobuffer* const buf, btoven_audioformat* fmt, uint32_t num_frames, va_list data );
 // Pop data out of the audiobuffer
 bool btoven_audiobuffer_pop( btoven_audiobuffer* const buffer, BTOVEN_STORETYPE** data, uint32_t num_frames );
 // Flush the audiobuffer

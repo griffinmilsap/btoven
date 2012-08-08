@@ -23,36 +23,36 @@ btoven_track* _btoven_tracks = NULL;
 size_t _btoven_num_tracks = 0;
 
 const btoven_config btoven_pc_config = { 
-	400, // Clock the system at 400 hz
-	20,  // Run detailed analysis every 20 clocks (20 Hz)
-	60,  // Lowest BPM we want to find is 60 BPM
-	240, // Highest BPM we want to find is 240BPM
-	90,  // Test 90 logarithmically distributed BPMs
-	1.5f // Weight history past 1.5 seconds less
+	400,    // Clock the system at 400 hz
+	20,     // Run detailed analysis every 20 clocks (20 Hz)
+	60,     // Lowest BPM we want to find is 60 BPM
+	240,    // Highest BPM we want to find is 240BPM
+	90,     // Test 90 logarithmically distributed BPMs
+	1.5f    // Weight history past 1.5 seconds less
 };
 
 const btoven_config btoven_mobile_config = {
-	100, // Clock the system at 100 hz
-	5,  // Run detailed analysis every 5 clocks (20 Hz)
-	60,  // Lowest BPM we want to find is 60 BPM
-	240, // Highest BPM we want to find is 240BPM
-	10,  // Test 30 logarithmically distributed BPMs (This is really tough on mobile).
-	1.5f // Weight history past 1.5 seconds less
+	100,    // Clock the system at 100 hz
+	5,      // Run detailed analysis every 5 clocks (20 Hz)
+	60,     // Lowest BPM we want to find is 60 BPM
+	240,    // Highest BPM we want to find is 240BPM
+	10,     // Test 10 logarithmically distributed BPMs (This is really tough on mobile).
+	1.5f    // Weight history past 1.5 seconds less
 };
 
 const btoven_state btoven_initial_state = {
-	0,                   // Initially, there is no BPM
-	0,                   // No BPM confidence
-	0,                   // No progress toward next beat
-	false,               // No beats have occurred yet
-	false,               // No transients on the horizon
-	false,
-	false,
-	0,                   // No current intensity
-	0,                   // No sectional intensity yet either.
-	0,                   // No current pitch
-	0,                   // No secondary pitch
-	0                    // No tertiary pitch
+	0,      // Initially, there is no BPM
+	0,      // No BPM confidence
+	0,      // No progress toward next beat
+	false,  // No beats have occurred yet
+	false,  // No low transients on the horizon
+	false,  // No mid transients
+	false,  // No high transients
+	0,      // No current intensity
+	0,      // No sectional intensity yet either.
+	0,      // No current pitch
+	0,      // No secondary pitch
+	0       // No tertiary pitch
 };
 
 // Retreive library version string
@@ -152,8 +152,11 @@ btoven_error btoven_create_track( btoven_audioformat fmt, btoven_trackhandle* h 
 	t->new_pcm = ( void** )malloc( t->af.channels * sizeof( void* ) );
 	t->pcm_chunk_size = t->af.rate / _btoven_cfg->sys_clock;
 	t->pcm_chunk = ( BTOVEN_STORETYPE** )malloc( sizeof( BTOVEN_STORETYPE* ) * t->af.channels );
-	for( i = 0; i < t->af.channels; i++ ) 
+	for( i = 0; i < t->af.channels; i++ )
+	{
+		t->new_pcm = malloc( sizeof( BTOVEN_STORETYPE ) * t->pcm_chunk_size );
 		t->pcm_chunk[i] = ( BTOVEN_STORETYPE* )malloc( sizeof( BTOVEN_STORETYPE ) * t->pcm_chunk_size );
+	}
 
 	// Prepare the fft
 	t->spectrum_size = ( t->pcm_chunk_size * ( _btoven_cfg->sys_clock / _btoven_cfg->analysis_dec ) );
@@ -263,24 +266,39 @@ btoven_state btoven_read_state( btoven_trackhandle h )
 }
 
 // Process the incoming PCM
-btoven_error btoven_process( btoven_trackhandle h, uint32_t num_frames, const void* const  pcm, ... )
+btoven_error btoven_process( btoven_trackhandle h, uint32_t num_frames, ... )
 {
-	uint8_t i;
+	size_t channel, frame;
 	btoven_track* t = &_btoven_tracks[h];
 	if( !btoven_initialized() )
 		return BTOVEN_NOT_INITIALIZED;
 	if( !t->valid )
 		return BTOVEN_INVALID_TRACK_HANDLE;
 
-	//memcpy( t->new_pcm[0], pcm, num_frames * t->af.channels * btoven_enc_size( t->af.enc ) );
-	if( !t->af.interleaved ) 
+	va_list data;
+	va_start( data, num_frames );
+
+	btoven_audiobuffer_vpush( t->ab, &( t->af ), num_frames, data );
+
+/*
+	if( t->af.interleaved )
 	{
+		BTOVEN_STORETYPE** data = ( BTOVEN_STORETYPE** )t->new_pcm;
+		for( channel = 0; channel < t->af.channels; channel++ )
+			for( frame = 0; frame < t->pcm_chunk_size; frame++ )
+				data[channel][frame] = btoven_decodePCM( &( t->af ), &pcm, 0, ( t->af.channels * frame ) + channel );
+	}
+	else 
+	{
+		memcpy( t->new_pcm[0], pcm, num_frames * btoven_enc_size( t->af.enc ) );
 		va_list ap;
 		va_start( ap, pcm );
-		for( i = 1; i < t->af.channels; i++ )
-			t->new_pcm[i] = va_arg( ap, void* );
+		for( channel = 1; channel < t->af.channels; channel++ )
+			memcpy( t->new_pcm[channel], va_arg( ap, void* ), num_frames * btoven_enc_size( t->af.enc ) );
 	}
-	btoven_audiobuffer_push( t->ab, &( t->af ), t->new_pcm, num_frames );
+
+	btoven_audiobuffer_push( t->ab, &( t->af ), num_frames, t->new_pcm );
+*/
 	
 	// While we still have data left to process, loop through and perform the analysis
 	while( btoven_audiobuffer_pop( t->ab, t->pcm_chunk, t->pcm_chunk_size ) )
