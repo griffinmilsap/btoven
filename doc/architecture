@@ -1,0 +1,7 @@
+BTOVEN Architecture
+Griffin Milsap, Motalen 2011
+
+Language: C(99)
+Wrappers: C++
+
+BTOVEN consists of the Format Core, a Signal Processing Core, 

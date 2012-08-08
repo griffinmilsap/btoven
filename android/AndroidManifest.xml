@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.motalen.btoven_example"
+      android:versionCode="1"
+      android:versionName="1.0">
+      
+    <application android:label="@string/app_name">
+        <activity android:name=".BtovenActivity"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+    
+	<uses-sdk android:minSdkVersion="14" />
+    
+    <!-- RECORD_AUDIO is needed to create an audio recorder -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>
+
+    <!-- INTERNET is needed to use a URI-based audio player, depending on the URI -->
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+</manifest> 

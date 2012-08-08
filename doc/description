@@ -1,0 +1,17 @@
+BTOVEN Description
+Griffin Milsap, Motalen 2011
+
+BTOVEN is a musical signal processing library.  Given a PCM stream, BTOVEN will run an analysis and report many important musical parameters in REAL TIME such as:
+
+* Tempo (BPM) (Ala Shierer et. al.)
+* Click Track (Ala Shierer et. al.)
+* Transient Detection (Custom Implementation)
+* Current Intensity
+* Sectional Intensity (Custom Implementation)
+
+And will support musical concepts involving tonality in the near future such as
+* Dominant Note Detection
+* Chord Detection
+
+BTOVEN is optimized for both desktop and embedded use, with optimizations made for signal processing technologies and hardware.  (DSPs, ARM NEON, x86_ASM Optimizations)
+
