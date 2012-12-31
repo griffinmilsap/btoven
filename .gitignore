@@ -26,6 +26,6 @@ install_manifest.txt
 .DS_Store
 
 # External Libraries
-# TODO: Add an ignore for these directories
+extern/
 
 

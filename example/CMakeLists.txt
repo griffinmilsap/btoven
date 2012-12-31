@@ -5,7 +5,7 @@ SET( EX_NAME btoven_c_example )
 SET( EX_SOURCES btoven_c_example.c )
 
 IF( MPG123_FOUND AND PORTAUDIO_FOUND )
-	FIND_PACKAGE( BTOVEN )
+	FIND_PACKAGE( btoven )
 	IF( BTOVEN_FOUND )
 		MESSAGE( STATUS "Found btoven installed in path; using installed copy" )
 		INCLUDE_DIRECTORIES( ${BTOVEN_INCLUDE_DIRS} )
