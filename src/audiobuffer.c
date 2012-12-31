@@ -5,6 +5,12 @@
 #include "environment.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stddef.h>
+
+#ifdef _MSC_VER
+#include <stdio.h>
+#include <stdarg.h>
+#endif // _MSC_VER
 
 // Defines the default number of frames to allocate space for
 #define DEFAULT_SIZE 2048
@@ -87,10 +93,10 @@ void btoven_audiobuffer_push( btoven_audiobuffer* const buf, btoven_audioformat*
 void btoven_audiobuffer_vpush( btoven_audiobuffer* const buf, btoven_audioformat* fmt, uint32_t num_frames, va_list data )
 {
 	size_t channel, frame;
+	const void* sample_data = va_arg( data, const void* );
 	
 	// Copy the new data into the buffer
 	resize_buffer_if_necessary( buf, num_frames );
-	const void* sample_data = va_arg( data, const void* );
 	for( channel = 0; channel < buf->channels; channel++ )
 	{
 		if( sample_data == NULL ) break;  // IF WE BREAK HERE, THIS INDICATES A SEVERE ERROR.

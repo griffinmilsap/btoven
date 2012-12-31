@@ -60,9 +60,13 @@ extern uint8_t _btoven_std_num_subbands;
 extern float _btoven_history_length; // Seconds
 
 #ifdef ANDROID
-#define LOG( format, args... ) __android_log_print( ANDROID_LOG_DEBUG, "btoven", format, ##args );
+	#define LOG( format, args... ) __android_log_print( ANDROID_LOG_DEBUG, "btoven", format, ##args );
 #else // ANDROID
-#define LOG( format, args... ) printf( format, ##args );
+	#ifdef _MSC_VER
+		#define LOG( format, ... ) printf( format, __VA_ARGS__ );
+	#else // _MSC_VER
+		#define LOG( format, args... ) printf( format, ##args );
+	#endif // _MSC_VER
 #endif // ANDROID
 
 #endif // _ENVIRONMENT_H

@@ -1,6 +1,3 @@
-# btoven
-# Motalen 2011
-
 CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
 PROJECT( BTOVEN )
 
@@ -11,6 +8,26 @@ SET( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${BTOVEN_SOURCE_DIR}/lib )
 SET( CMAKE_EXECUTABLE_OUTPUT_DIRECTORY ${BTOVEN_SOURCE_DIR}/bin )
 SET( CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_DEBUG ${BTOVEN_SOURCE_DIR}/bin )
 SET( CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_RELEASE ${BTOVEN_SOURCE_DIR}/bin )
+
+SET( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${BTOVEN_SOURCE_DIR}/cmake/modules/" )
+
+# These dependencies are only required for btoven_c_example
+FIND_PACKAGE( Portaudio )
+FIND_PACKAGE( mpg123 )
+
+# Btoven requires stdint.h
+INCLUDE( CheckIncludeFiles )
+CHECK_INCLUDE_FILES( "stdint.h" HAVE_STDINT_H )
+
+# Visual Studio 2008 Compatibility (Missing stdint.h)
+IF( NOT HAVE_STDINT_H )
+	IF( MSVC )
+		MESSAGE( STATUS "Using packaged stdint.h for MSVC for convenience" )
+		INCLUDE_DIRECTORIES( ${BTOVEN_SOURCE_DIR}/src/msvc )
+	ELSE( MSVC )
+		MESSAGE( FATAL_ERROR "Please procure an stdint.h for your compiler" )
+	ENDIF( MSVC )
+ENDIF( NOT HAVE_STDINT_H )
 
 ADD_SUBDIRECTORY( src )
 ADD_SUBDIRECTORY( example )

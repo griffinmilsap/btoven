@@ -13,6 +13,10 @@
 #include <fcntl.h>
 #endif // __GNUC__
 
+#ifdef __MSC_VER__
+#include <conio.h>
+#endif // __MSC_VER__
+
 //#define DONT_PRINT
 
 // Globals
@@ -100,15 +104,22 @@ int _kbhit(void)
 
 int main( int argc, char* argv[] )
 {
-	size_t i, j;
+	size_t i, j, idx, block_size;
+	char* filename = NULL;
+	btoven_audioformat fmt;
+	btoven_trackhandle h;
+	PaStream *stream = NULL;
+	PaStreamParameters inputParameters, outputParameters;
+	char bar[32] = "";
+	int16_t* block = NULL;
+
 	printf( "========================\n" );
 	printVersion();
 	printf( "Example C Implementation\n" );
 	printf( "========================\n\n" );
 	
 	// Parse arguments
-	char* filename = NULL;
-	for( i = 1; i < argc; i++ )
+	for( i = 1; i < ( size_t )argc; i++ )
 	{
 		char* arg = argv[i];
 		if( !strcmp( arg, "--help" ) || !strcmp( arg, "-h" ) || !strcmp( arg, "?" ) ) 
@@ -125,12 +136,15 @@ int main( int argc, char* argv[] )
 	// Prepare MPG123 to read the file
 	if( filename )
 	{
+		int err = MPG123_OK;
+		long rate = 0;
+		int channels = 0, encoding = 0;
+
 		printf( "User specified input file.\n" );
 		printf( "Initializing mpg123 for decoding: %s\n", filename );
-		int err = MPG123_OK;
 		
 		// Initialize file and engine
-		if(    ( err = mpg123_init() ) != MPG123_OK 
+		if(  ( err = mpg123_init() ) != MPG123_OK 
 			|| ( mh = mpg123_new( NULL, &err ) ) == NULL
 			|| ( err = mpg123_open( mh, filename ) ) != MPG123_OK )
 		{
@@ -140,8 +154,6 @@ int main( int argc, char* argv[] )
 		printf( "MPG123 Initialized.\n" );
 		
 		// Grab the format
-		long rate = 0;
-		int channels = 0, encoding = 0;
 		if( mpg123_getformat( mh, &rate, &channels, &encoding ) != MPG123_OK )
 		{
 			printf( "Trouble with mpg123: %s\n",
@@ -159,8 +171,7 @@ int main( int argc, char* argv[] )
 	printf( "Initializing btoven...\n" );
 	if( checkBtovenError( btoven_initialize( NULL ) ) )
 		return -1;
-	btoven_audioformat fmt;
-	btoven_trackhandle h;
+
 	fmt.enc = BTOVEN_ENC_SIGNED_16;
 	fmt.rate = ( uint32_t )SAMPLE_RATE;
 	fmt.channels = 2;
@@ -169,9 +180,6 @@ int main( int argc, char* argv[] )
 	printf( "btoven_trackhandle: %u\n", h );
 	
 	// Set up portaudio to play the file
-	PaStream *stream = NULL;
-	PaStreamParameters inputParameters, outputParameters;
-
 	if( checkPaErr( Pa_Initialize(), "Error Initializing Portaudio.\n" ) )
 		return -1;
 	
@@ -203,8 +211,8 @@ int main( int argc, char* argv[] )
 		return -1;
 	
 	// Enter the processing loop
-	size_t block_size = FRAMES_PER_BUFFER * NUM_CHANNELS;
-	int16_t* block = ( int16_t* )malloc( sizeof( int16_t ) * block_size );
+	block_size = FRAMES_PER_BUFFER * NUM_CHANNELS;
+	block = ( int16_t* )malloc( sizeof( int16_t ) * block_size );
 	if( filename )
 		printf( "Reading decoded audio into btoven with playback.\n" );
 	else
@@ -239,7 +247,6 @@ int main( int argc, char* argv[] )
 		printf( "btoven ---------------------------\n" );
 		printf( "bpm: %d \t Confidence = 0%% \n", state.bpm );
 		
-		char bar[32] = "";
 		for( j = 0; j < state.cur_intensity; j += 200 )
 			strcat( bar, "=" );
 		printf( "cur_intensity: %s \n", bar );
@@ -249,7 +256,7 @@ int main( int argc, char* argv[] )
 			strcat( bar, "=" );
 		printf( "sec_intensity: %s \n", bar );
 		
-		size_t idx = state.percent_to_next / 32;
+		idx = state.percent_to_next / 32;
 		printf( "percent_to_next: [" );
 		for( j = 0; j < 8; j++ )
 			if( j == idx ) printf( "|" ); else printf( " " );

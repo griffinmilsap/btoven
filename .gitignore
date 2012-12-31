@@ -1,6 +1,8 @@
 # Binaries
 btoven_c_example
+btoven_c_example.exe
 libbtoven.a
+btoven.lib
 
 # CMake
 CMakeCache.txt
@@ -9,8 +11,21 @@ Makefile
 cmake_install.cmake
 install_manifest.txt
 
-# External files
+# Visual Studio Junk
+*.vcproj*
+*.ncb
+*.sln
+*.suo
+*.dir
+*.idb
+*.pdb
+*.ilk
+
+# Junk Files
 *~
 .DS_Store
+
+# External Libraries
+# TODO: Add an ignore for these directories
 
 

@@ -185,7 +185,7 @@ btoven_error btoven_create_track( btoven_audioformat fmt, btoven_trackhandle* h 
 	// Set up the filterbank
 	t->filterbank = ( biquad_filter** )malloc( sizeof( biquad_filter* ) * _btoven_std_num_subbands );
 	t->filterbank[0] = biquad_new( LPF, 0, _btoven_std_subbands[0], t->af.rate, 1.0f );
-	for( i = 0; i < ( _btoven_std_num_subbands - 2 ); i++ )
+	for( i = 0; i < ( size_t )( _btoven_std_num_subbands - 2 ); i++ )
 	{
 		double cf = ( _btoven_std_subbands[i] + _btoven_std_subbands[ i + 1 ] ) / 2.0f;
 		double bw = ( _btoven_std_subbands[ i + 1 ] - _btoven_std_subbands[i] ) / cf;
@@ -268,14 +268,13 @@ btoven_state btoven_read_state( btoven_trackhandle h )
 // Process the incoming PCM
 btoven_error btoven_process( btoven_trackhandle h, uint32_t num_frames, ... )
 {
-	size_t channel, frame;
+	va_list data;
 	btoven_track* t = &_btoven_tracks[h];
+
 	if( !btoven_initialized() )
 		return BTOVEN_NOT_INITIALIZED;
 	if( !t->valid )
 		return BTOVEN_INVALID_TRACK_HANDLE;
-
-	va_list data;
 	va_start( data, num_frames );
 
 	btoven_audiobuffer_vpush( t->ab, &( t->af ), num_frames, data );
